@@ -1,0 +1,28 @@
+version: '3.9'
+services:
+  alais:
+    image: 'ghcr.io/letsbuilda/anubis:main'
+    pull_policy: 'always'
+    restart: 'always'
+    env_file:
+      - '/opt/letsbuilda/alais-env.list'
+
+  larkbot:
+    image: 'ghcr.io/letsbuilda/larkbot:main'
+    pull_policy: 'always'
+    restart: 'always'
+    env_file:
+      - '/opt/letsbuilda/larkbot-env.list'
+
+  letsbuilda-postgres:
+    image: 'postgres:15.0'
+    pull_policy: 'always'
+    restart: 'always'
+    environment:
+      - 'POSTGRES_USER=letsbuilda'
+      - 'POSTGRES_PASSWORD=letsbuilda'
+      - 'PGDATA=/var/lib/postgresql/data/pgdata'
+    ports:
+      - '5432:5432'
+    volumes:
+      - '/opt/letsbuilda/pg-data:/var/lib/postgresql/data'
