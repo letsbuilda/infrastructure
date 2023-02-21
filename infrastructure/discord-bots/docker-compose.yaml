@@ -4,24 +4,24 @@ services:
     pull_policy: 'always'
     restart: 'always'
     env_file:
-      - '/opt/letsbuilda/alais-env.list'
+      - '/opt/letsbuilda/discord-bots/alais-env.list'
 
   larkbot:
     image: 'ghcr.io/letsbuilda/larkbot:main'
     pull_policy: 'always'
     restart: 'always'
     env_file:
-      - '/opt/letsbuilda/larkbot-env.list'
+      - '/opt/letsbuilda/discord-bots/larkbot-env.list'
 
-  letsbuilda-postgres:
+  letsbuilda-discord-bots-postgres:
     image: 'postgres:15.0'
     pull_policy: 'always'
     restart: 'always'
     environment:
-      - 'POSTGRES_USER=letsbuilda'
-      - 'POSTGRES_PASSWORD=letsbuilda'
+      - 'POSTGRES_USER=admin'
+      - 'POSTGRES_PASSWORD=changemeplz'
       - 'PGDATA=/var/lib/postgresql/data/pgdata'
     ports:
       - '5432:5432'
     volumes:
-      - '/opt/letsbuilda/pg-data:/var/lib/postgresql/data'
+      - '/opt/letsbuilda/discord-bots/pg-data:/var/lib/postgresql/data'
