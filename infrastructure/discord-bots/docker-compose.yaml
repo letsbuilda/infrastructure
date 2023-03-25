@@ -13,6 +13,13 @@ services:
     env_file:
       - '/opt/letsbuilda/discord-bots/larkbot-env.list'
 
+  alessia:
+    image: 'ghcr.io/letsbuilda/alessia:main'
+    pull_policy: 'always'
+    restart: 'always'
+    env_file:
+      - '/opt/letsbuilda/discord-bots/alessia-env.list'
+
   letsbuilda-discord-bots-postgres:
     image: 'postgres:15.0'
     pull_policy: 'always'
