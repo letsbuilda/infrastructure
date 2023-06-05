@@ -1,13 +1,13 @@
 services:
   anubis:
-    image: 'ghcr.io/letsbuilda/anubis:main'
+    image: 'ghcr.io/letsbuilda/anubis:edge'
     pull_policy: 'always'
     restart: 'always'
     env_file:
       - '/opt/letsbuilda/discord-bots/anubis-env.list'
 
   alessia:
-    image: 'ghcr.io/letsbuilda/alessia:main'
+    image: 'ghcr.io/letsbuilda/alessia:edge'
     pull_policy: 'always'
     restart: 'always'
     env_file:
