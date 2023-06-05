@@ -25,3 +25,12 @@ services:
       - '5432:5432'
     volumes:
       - '/opt/letsbuilda/discord-bots/pg-data:/var/lib/postgresql/data'
+
+  snekbox:
+    image: 'ghcr.io/python-discord/snekbox:latest'
+    pull_policy: 'always'
+    restart: 'always'
+    ipc: "none"
+    privileged: true
+    ports:
+      - '8060:8060'
