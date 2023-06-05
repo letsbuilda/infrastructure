@@ -6,13 +6,6 @@ services:
     env_file:
       - '/opt/letsbuilda/discord-bots/alais-env.list'
 
-  larkbot:
-    image: 'ghcr.io/letsbuilda/larkbot:main'
-    pull_policy: 'always'
-    restart: 'always'
-    env_file:
-      - '/opt/letsbuilda/discord-bots/larkbot-env.list'
-
   alessia:
     image: 'ghcr.io/letsbuilda/alessia:main'
     pull_policy: 'always'
