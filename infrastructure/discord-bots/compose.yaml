@@ -7,11 +7,18 @@ services:
       - '/opt/letsbuilda/discord-bots/anubis-env.list'
 
   alessia:
-    image: 'ghcr.io/vipyrsec/alessia:edge'
+    image: 'ghcr.io/vipyrsec/alessia:sha256-22c3f0ca064eb8d1a206234b87a42cf81ad4eb7d15eb4f46a0d2b80720eff256.sig'
     pull_policy: 'always'
     restart: 'always'
     env_file:
       - '/opt/letsbuilda/discord-bots/alessia-env.list'
+
+  alessia-new:
+    image: 'ghcr.io/vipyrsec/alessia:edge'
+    pull_policy: 'always'
+    restart: 'always'
+    env_file:
+      - '/opt/letsbuilda/discord-bots/alessia-new-env.list'
 
   letsbuilda-discord-bots-postgres:
     image: 'postgres:15.0'
