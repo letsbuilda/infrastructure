@@ -7,7 +7,7 @@ services:
       - '/opt/letsbuilda/discord-bots/anubis-env.list'
 
   alessia:
-    image: 'ghcr.io/vipyrsec/alessia:sha256-22c3f0ca064eb8d1a206234b87a42cf81ad4eb7d15eb4f46a0d2b80720eff256.sig'
+    image: 'ghcr.io/vipyrsec/alessia:dc060c5aa07eaf8575cb8c5a918d5038e9d54bc8'
     pull_policy: 'always'
     restart: 'always'
     env_file:
