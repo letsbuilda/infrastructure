@@ -13,12 +13,12 @@ services:
     env_file:
       - '/opt/letsbuilda/discord-bots/alessia-env.list'
 
-  alessia-new:
-    image: 'ghcr.io/vipyrsec/alessia:edge'
+  dragonfly-bot:
+    image: 'ghcr.io/vipyrsec/dragonfly-bot:edge'
     pull_policy: 'always'
     restart: 'always'
     env_file:
-      - '/opt/letsbuilda/discord-bots/alessia-new-env.list'
+      - '/opt/letsbuilda/discord-bots/dragonfly-bot-env.list'
 
   letsbuilda-discord-bots-postgres:
     image: 'postgres:15.0'
