@@ -14,7 +14,7 @@ services:
       - '/opt/letsbuilda/discord-bots/alessia-env.list'
 
   dragonfly-bot:
-    image: 'ghcr.io/vipyrsec/dragonfly-bot:edge'
+    image: 'ghcr.io/vipyrsec/bot:edge'
     pull_policy: 'always'
     restart: 'always'
     env_file:
