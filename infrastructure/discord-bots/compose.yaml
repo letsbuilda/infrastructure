@@ -13,13 +13,6 @@ services:
     env_file:
       - '/opt/letsbuilda/discord-bots/anubis-vipyr-env.list'
 
-  vipyr-bot:
-    image: 'ghcr.io/vipyrsec/bot:edge'
-    pull_policy: 'always'
-    restart: 'always'
-    env_file:
-      - '/opt/letsbuilda/discord-bots/vipyr-bot-env.list'
-
   letsbuilda-discord-bots-postgres:
     image: 'postgres:15.0'
     pull_policy: 'always'
