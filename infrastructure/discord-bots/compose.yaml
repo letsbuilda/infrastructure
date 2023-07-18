@@ -13,13 +13,6 @@ services:
     env_file:
       - '/opt/letsbuilda/discord-bots/anubis-vipyr-env.list'
 
-  vipyr-bot-old:
-    image: 'ghcr.io/vipyrsec/bot:21be6f77ee4b03134896a7f5730ae310626bda43'
-    pull_policy: 'always'
-    restart: 'always'
-    env_file:
-      - '/opt/letsbuilda/discord-bots/vipyr-bot-old-env.list'
-
   vipyr-bot:
     image: 'ghcr.io/vipyrsec/bot:edge'
     pull_policy: 'always'
