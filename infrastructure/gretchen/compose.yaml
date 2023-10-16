@@ -34,3 +34,10 @@ services:
     privileged: true
     ports:
       - '8060:8060'
+
+  dragonfly-client:
+    image: 'ghcr.io/vipyrsec/dragonfly-client-rs:latest'
+    pull_policy: 'always'
+    restart: 'always'
+    env_file:
+      - '/opt/infrastructure/infrastructure/gretchen/dragonfly-client-env.list'
