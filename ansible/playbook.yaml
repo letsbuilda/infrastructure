@@ -5,6 +5,9 @@
 - name: Deploy Docker
   hosts: docker
   roles: [docker]
+- name: Deploy Minecraft
+  hosts: microwave
+  roles: [minecraft]
 - name: Clean up Docker resources
   hosts: docker
   tasks:

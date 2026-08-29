@@ -1,0 +1,15 @@
+---
+- name: Create the compose.yaml file
+  ansible.builtin.copy:
+    src: compose.yaml
+    dest: /opt/letsbuilda/minecraft/compose.yaml
+    owner: letsbuilda
+    group: letsbuilda
+    mode: '0600'
+- name: Run the containers
+  become: true
+  become_user: letsbuilda
+  community.docker.docker_compose_v2:
+    project_src: /opt/letsbuilda/minecraft/
+    remove_orphans: true
+    pull: always
