@@ -1,0 +1,12 @@
+---
+autodiscover:
+  type: CNAME
+  value: autodiscover.outlook.com.
+
+selector1._domainkey:
+  type: CNAME
+  value: selector1-letsbuilda-dev._domainkey.darbiadev.onmicrosoft.com
+
+selector2._domainkey:
+  type: CNAME
+  value: selector2-letsbuilda-dev._domainkey.darbiadev.onmicrosoft.com
