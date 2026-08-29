@@ -2,7 +2,7 @@
 all:
   hosts:
     microwave:
-      ansible_host: 146.190.196.51
+      ansible_host: microwave.box.letsbuilda.dev
   children:
     docker:
       hosts:
