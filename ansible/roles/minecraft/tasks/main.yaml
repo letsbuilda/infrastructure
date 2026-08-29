@@ -1,4 +1,11 @@
 ---
+- name: Create configuration directory
+  ansible.builtin.file:
+    path: /opt/letsbuilda/minecraft/
+    state: directory
+    owner: letsbuilda
+    group: letsbuilda
+    mode: '0700'
 - name: Create the compose.yaml file
   ansible.builtin.copy:
     src: compose.yaml
