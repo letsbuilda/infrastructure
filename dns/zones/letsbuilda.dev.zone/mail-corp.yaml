@@ -1,0 +1,44 @@
+---
+# Microsoft 365 (tenant: darbiadev.onmicrosoft.com) mail routing and
+# authentication for letsbuilda.dev.
+#
+# `auto-ttl: true` means the record uses Cloudflare's "Auto" TTL; octodns
+# models that as ttl 300, so the ttl below is left at the 300 default.
+
+"":
+  - type: MX
+    ttl: 3600
+    values:
+      - preference: 0
+        exchange: letsbuilda-dev.mail.protection.outlook.com.
+  - type: TXT
+    value: v=spf1 include:spf.protection.outlook.com -all
+    octodns:
+      cloudflare:
+        auto-ttl: true
+
+_dmarc:
+  type: TXT
+  value: 'v=DMARC1\; p=reject\; sp=reject\; adkim=s\; aspf=s\; fo=0:1:d:s\; rua=mailto:5888f689c3244f2494e8cca1efe0e67d@dmarc-reports.cloudflare.net,mailto:dmarc@letsbuilda.dev\; ruf=mailto:dmarc@letsbuilda.dev\;'
+  octodns:
+    cloudflare:
+      auto-ttl: true
+
+autodiscover:
+  type: CNAME
+  ttl: 3600
+  value: autodiscover.outlook.com.
+
+selector1._domainkey:
+  type: CNAME
+  value: selector1-letsbuilda-dev._domainkey.darbiadev.onmicrosoft.com.
+  octodns:
+    cloudflare:
+      auto-ttl: true
+
+selector2._domainkey:
+  type: CNAME
+  value: selector2-letsbuilda-dev._domainkey.darbiadev.onmicrosoft.com.
+  octodns:
+    cloudflare:
+      auto-ttl: true

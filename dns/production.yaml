@@ -1,0 +1,33 @@
+---
+manager:
+  plan_outputs:
+    html:
+      class: octodns.provider.plan.PlanMarkdown
+
+providers:
+  zone_config:
+    class: octodns.provider.yaml.YamlProvider
+    directory: dns/zones
+    default_ttl: 300
+    enforce_order: false
+    split_extension: ".zone"
+  cloudflare:
+    class: octodns_cloudflare.CloudflareProvider
+    token: env/CLOUDFLARE_TOKEN
+    account_id: env/CLOUDFLARE_ACCOUNT_ID
+    pagerules: false
+
+processors:
+  ignore-cf-placeholders:
+    class: octodns.processor.filter.NetworkValueRejectlistFilter
+    rejectlist:
+      - 100::/128
+
+zones:
+  "*":
+    sources:
+      - zone_config
+    targets:
+      - cloudflare
+    processors:
+      - ignore-cf-placeholders

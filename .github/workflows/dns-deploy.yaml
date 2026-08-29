@@ -1,0 +1,31 @@
+---
+name: Deploy DNS to providers
+on:
+  push:
+    branches: [main]
+    paths: [dns/production.yaml, dns/zones/**]
+permissions:
+  contents: read
+jobs:
+  octodns-sync:
+    environment: cloudflare
+    name: Sync latest changes to DNS providers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+          activate-environment: true
+      - name: Install dependencies
+        run: uv sync --frozen --only-group dns
+      - name: Sync DNS
+        env:
+          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: uv run octodns-sync --config-file=dns/production.yaml --doit --force

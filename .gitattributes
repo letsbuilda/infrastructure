@@ -1,0 +1,5 @@
+# Detect all the things!
+* linguist-detectable
+
+# Add color to DNS zone files
+*.zone linguist-language=DNS-Zone
