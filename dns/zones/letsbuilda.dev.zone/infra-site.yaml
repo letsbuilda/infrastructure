@@ -1,15 +1,32 @@
 ---
 # Public-facing site and application endpoints for letsbuilda.dev.
+#
+# `auto-ttl: true` means the record uses Cloudflare's "Auto" TTL; octodns
+# models that as ttl 300, so the ttl below is left at the 300 default.
 
 docs:
   type: CNAME
   value: letsbuilda.github.io.
+  octodns:
+    cloudflare:
+      proxied: true
+      auto-ttl: true
 
 id:
   type: CNAME
   value: letsbuilda-prod-cd-7lwe54jj1hpxqzrf.edge.tenants.us.auth0.com.
+  octodns:
+    cloudflare:
+      auto-ttl: true
 
-# Placeholder (RFC 5737 TEST-NET-1) until the apex site has a real origin.
+# 192.0.2.1 is the dummy address Cloudflare documents for records that only
+# exist so a request reaches their edge and a rule can act on it -- here, the
+# Redirect Rule sending www to the apex. It must stay proxied: un-proxying it
+# would send visitors to an unroutable address instead of the redirect.
 www:
   type: A
   value: 192.0.2.1
+  octodns:
+    cloudflare:
+      proxied: true
+      auto-ttl: true
