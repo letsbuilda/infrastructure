@@ -28,4 +28,3 @@
     name: docker-ce
     state: latest
     update_cache: true
-
