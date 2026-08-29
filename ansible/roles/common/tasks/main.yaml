@@ -1,0 +1,10 @@
+---
+- name: Install aptitude
+  ansible.builtin.apt:
+    name: aptitude
+    state: latest
+- name: Update all packages to their latest version
+  ansible.builtin.apt:
+    name: '*'
+    state: latest
+    update_cache: true

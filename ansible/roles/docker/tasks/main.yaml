@@ -1,0 +1,31 @@
+---
+- name: Install required system packages
+  ansible.builtin.apt:
+    pkg: [ca-certificates, curl, python3-debian, python3-requests]
+    state: latest
+- name: Create apt keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+- name: Add Docker GPG apt key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+    checksum: sha256:1500c1f56fa9e26b9b8f42452a553675796ade0807cdce11975eb98170b3a570
+- name: Add Docker repository
+  ansible.builtin.deb822_repository:
+    name: docker
+    types: [deb]
+    uris: [https://download.docker.com/linux/ubuntu]
+    suites: ["{{ ansible_facts['distribution_release'] }}"]
+    components: [stable]
+    signed_by: /etc/apt/keyrings/docker.asc
+    state: present
+- name: Update apt and install docker-ce
+  ansible.builtin.apt:
+    name: docker-ce
+    state: latest
+    update_cache: true
+

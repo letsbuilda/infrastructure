@@ -1,0 +1,32 @@
+[project]
+name = "infrastructure"
+version = "0.0.0" # explicitly non-versioned
+requires-python = ">=3.14"
+
+[dependency-groups]
+dev = [
+    "prek>=0.4.11",
+]
+ansible = [
+    "ansible>=14.2.0",
+    "ansible-lint>=26.6.0",
+]
+dns = [
+    "octodns>=1.21.0",
+    "octodns-cloudflare>=1.2.0",
+]
+cloudflare = [
+    "pyyaml>=6.0.2",
+]
+
+[tool.uv]
+# Sync with Dependabot's uv version
+required-version = ">=0.11.8"
+exclude-newer = "P7D"
+environments = [
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+]
+
+# I want this, but it adds random indents which cause syntax errors
+# [tool.yamlfix]
+# explicit_start = false

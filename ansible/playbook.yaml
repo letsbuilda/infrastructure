@@ -1,0 +1,14 @@
+---
+- name: Run common setup
+  hosts: all
+  roles: [common]
+- name: Deploy Docker
+  hosts: docker
+  roles: [docker]
+- name: Clean up Docker resources
+  hosts: docker
+  tasks:
+    - name: Clean up Docker resources
+      community.docker.docker_prune:
+        images: true
+        containers: true
