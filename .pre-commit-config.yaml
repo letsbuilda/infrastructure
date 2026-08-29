@@ -18,10 +18,10 @@ repos:
       - id: yamlfix
         exclude: compose.yaml|dependabot.yaml|^dns
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: b17b79c1cab56c3d1025ad36cb117fe602e570fd  # frozen: 0.11.23
+    rev: b84c4a0a90bd58c7d82ae8f0d4d5e77b1ddd3ce6  # frozen: 0.12.5
     hooks:
       - id: uv-lock
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: e3eebf65325ccc992422292cb7a4baee967cf815  # frozen: v1.26.1
+    rev: 451b56af716f9f0d0c2b816503a3fd0cf8b036fa  # frozen: v1.29.0
     hooks:
       - id: zizmor
