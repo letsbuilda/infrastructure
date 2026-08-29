@@ -1,5 +1,5 @@
 services:
-  mc:
+  minecraft:
     image: itzg/minecraft-server
     tty: true
     stdin_open: true
