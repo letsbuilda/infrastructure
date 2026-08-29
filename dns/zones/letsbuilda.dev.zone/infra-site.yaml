@@ -1,0 +1,15 @@
+---
+# Public-facing site and application endpoints for letsbuilda.dev.
+
+docs:
+  type: CNAME
+  value: letsbuilda.github.io.
+
+id:
+  type: CNAME
+  value: letsbuilda-prod-cd-7lwe54jj1hpxqzrf.edge.tenants.us.auth0.com.
+
+# Placeholder (RFC 5737 TEST-NET-1) until the apex site has a real origin.
+www:
+  type: A
+  value: 192.0.2.1
