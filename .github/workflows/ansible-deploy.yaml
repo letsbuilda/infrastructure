@@ -1,0 +1,44 @@
+---
+name: Deploy Ansible configuration
+on:
+  push:
+    branches: [main]
+    paths: [ansible/**]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ansible-deploy
+  cancel-in-progress: false
+jobs:
+  ansible-playbook:
+    environment: ansible
+    name: Run the playbook against all hosts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d  # v10.0.1
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+          activate-environment: true
+      - name: Install dependencies
+        run: uv sync --frozen --only-group ansible
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |-
+          install -d -m 0700 "$HOME/.ssh"
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 0600 "$HOME/.ssh/id_ed25519"
+          cat ansible/known_hosts >> "$HOME/.ssh/known_hosts"
+      - name: Run the playbook
+        working-directory: ansible
+        env:
+          ANSIBLE_REMOTE_USER: ci
+          ANSIBLE_BECOME_ASK_PASS: 'false'
+        run: uv run ansible-playbook --diff playbook.yaml
