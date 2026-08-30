@@ -1,17 +1,16 @@
 ---
+# smp-py aliases the microwave.box host record so renumbering the Droplet
+# stays a hosts-box.yaml-only change. RFC 2782 forbids an SRV target from
+# resolving through an alias, so any SRV added here must keep targeting
+# microwave.box (as the one below does), never smp-py itself. Unproxied
+# because Cloudflare's HTTP proxy does not carry TCP/25565.
 smp-py:
-  - type: A
-    value: 146.190.196.51
-    octodns:
-      cloudflare:
-        proxied: false
-        auto-ttl: true
-  - type: AAAA
-    value: 2604:a880:400:d1:0:4:e4cf:6001
-    octodns:
-      cloudflare:
-        proxied: false
-        auto-ttl: true
+  type: CNAME
+  value: microwave.box.letsbuilda.dev.
+  octodns:
+    cloudflare:
+      proxied: false
+      auto-ttl: true
 
 _minecraft._tcp.smp-py:
   type: SRV
