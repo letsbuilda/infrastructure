@@ -4,6 +4,16 @@ services:
     tty: true
     stdin_open: true
     user: "${MINECRAFT_UID:?}:${MINECRAFT_GID:?}"
+    restart: unless-stopped
+    security_opt:
+      - "no-new-privileges:true"
+    cap_drop:
+      - ALL
+    # Cgroup ceilings above the fixed 4 GiB JVM heap (MEMORY below), so the
+    # JVM hits its own limit before the kernel OOM killer gets involved.
+    mem_limit: 6g
+    mem_reservation: 4g
+    pids_limit: 512
     ports:
       - "25565:25565"
     environment:
