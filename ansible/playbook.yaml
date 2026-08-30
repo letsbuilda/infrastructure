@@ -2,6 +2,9 @@
 - name: Manage users
   hosts: all
   roles: [users]
+- name: Harden SSH
+  hosts: all
+  roles: [sshd]
 - name: Run common setup
   hosts: all
   roles: [common]

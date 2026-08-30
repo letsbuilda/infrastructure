@@ -1,0 +1,13 @@
+---
+# The copy task's validate: only parses the drop-in on its own; this checks the
+# full assembled config, and a failure here aborts before the restart handler
+# below can lock us out. Handlers run in the order defined in this file.
+- name: Check sshd config
+  ansible.builtin.command: /usr/sbin/sshd -t
+  changed_when: false
+  become: true
+- name: Restart ssh
+  ansible.builtin.systemd_service:
+    name: ssh.service
+    state: restarted
+  become: true
