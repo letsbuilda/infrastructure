@@ -68,13 +68,3 @@ repo and nothing in CI fails when they drift — re-check them when auditing:
   Use the cloud firewall, not ufw: Docker publishes container ports through its own
   iptables chains, which are evaluated before ufw's rules — a host firewall silently
   does not cover port 25565.
-
-## Historical credentials in git history
-
-Blobs from the deleted `infrastructure/discord-bots` and `infrastructure/gretchen`
-trees (commits `458a899`, `3666be3`, removed in `626c108`/`cff2089`) contain
-placeholder database credentials (`changemeplz`, `POSTGRES_PASSWORD=letsbuilda`).
-Anyone who can clone the repo can read them, so treat them as public: if any of
-those services still runs anywhere, rotate its credentials. Deliberately no history
-rewrite — the values are placeholders and rewriting published history breaks every
-clone for little gain.
