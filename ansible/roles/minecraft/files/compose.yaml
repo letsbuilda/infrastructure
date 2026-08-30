@@ -20,10 +20,16 @@ services:
       EULA: "TRUE"
       TYPE: "PAPER"
       DIFFICULTY: "hard"
+      # Nothing verifies the username a client claims; SimpleLogin (below) is
+      # what actually authenticates players
+      ONLINE_MODE: "false"
       MEMORY: "4096M"
       MOTD: "Pet your local wolf!"
+      # Offline UUID for Shenanigander. With ONLINE_MODE off the server derives
+      # UUIDs from md5("OfflinePlayer:<name>") instead of Mojang account IDs, so
+      # a username here would resolve to a premium UUID that never matches.
       OPS: |
-        Shenanigander
+        f80b6217-80b9-395e-b939-6c4aababbfdd
       EXISTING_OPS_FILE: SYNCHRONIZE
       # Resolved against VERSION and the Paper loader on every start, newest
       # release only. Left unpinned deliberately: Dependabot only understands
