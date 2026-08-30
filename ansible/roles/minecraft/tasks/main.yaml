@@ -18,10 +18,26 @@
     owner: letsbuilda
     group: letsbuilda
     mode: '0750'
+# A missing bind mount source becomes an empty root-owned dir; on a read-only
+# mount that means the patch silently does not apply
+- name: Create the patch definitions directory
+  ansible.builtin.file:
+    path: /opt/letsbuilda/minecraft/patches
+    state: directory
+    owner: letsbuilda
+    group: letsbuilda
+    mode: '0750'
 - name: Create the compose.yaml file
   ansible.builtin.copy:
     src: compose.yaml
     dest: /opt/letsbuilda/minecraft/compose.yaml
+    owner: letsbuilda
+    group: letsbuilda
+    mode: '0600'
+- name: Create the spigot.yml patch definition
+  ansible.builtin.copy:
+    src: patches/spigot.yaml
+    dest: /opt/letsbuilda/minecraft/patches/spigot.yaml
     owner: letsbuilda
     group: letsbuilda
     mode: '0600'
