@@ -1,0 +1,13 @@
+[Unit]
+Description=Route outbound traffic over the DigitalOcean reserved IPv6
+Documentation=https://docs.digitalocean.com/products/networking/reserved-ips/how-to/outbound-traffic/
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/reserved-ipv6.sh
+
+[Install]
+WantedBy=multi-user.target
