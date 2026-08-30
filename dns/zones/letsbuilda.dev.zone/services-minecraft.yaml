@@ -1,9 +1,4 @@
 ---
-# smp-py aliases the microwave.box host record so renumbering the Droplet
-# stays a hosts-box.yaml-only change. RFC 2782 forbids an SRV target from
-# resolving through an alias, so any SRV added here must keep targeting
-# microwave.box (as the one below does), never smp-py itself. Unproxied
-# because Cloudflare's HTTP proxy does not carry TCP/25565.
 smp-py:
   type: CNAME
   value: microwave.box.letsbuilda.dev.
