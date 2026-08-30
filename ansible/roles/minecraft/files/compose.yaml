@@ -15,5 +15,7 @@ services:
       OPS: |
         Shenanigander
       EXISTING_OPS_FILE: SYNCHRONIZE
+      UID: "${UID:?}"
+      GID: "${GID:?}"
     volumes:
       - "./data:/data"

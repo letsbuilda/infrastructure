@@ -1,4 +1,8 @@
 ---
+- name: Look up the letsbuilda account
+  ansible.builtin.getent:
+    database: passwd
+    key: letsbuilda
 - name: Create configuration directory
   ansible.builtin.file:
     path: /opt/letsbuilda/minecraft/
@@ -10,6 +14,15 @@
   ansible.builtin.copy:
     src: compose.yaml
     dest: /opt/letsbuilda/minecraft/compose.yaml
+    owner: letsbuilda
+    group: letsbuilda
+    mode: '0600'
+- name: Create the .env file
+  ansible.builtin.copy:
+    content: |
+      UID={{ ansible_facts.getent_passwd['letsbuilda'][1] }}
+      GID={{ ansible_facts.getent_passwd['letsbuilda'][2] }}
+    dest: /opt/letsbuilda/minecraft/.env
     owner: letsbuilda
     group: letsbuilda
     mode: '0600'
