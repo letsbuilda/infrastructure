@@ -1,3 +1,2 @@
-# Pinned SSH host keys for managed hosts, appended to ~/.ssh/known_hosts in CI.
-# Populate with `ssh-keyscan -t ed25519 microwave.box.letsbuilda.dev` from a
-# trusted network, after verifying the fingerprint out-of-band.
+# microwave.box.letsbuilda.dev:22 SSH-2.0-OpenSSH_10.2p1 Ubuntu-2ubuntu3.5
+microwave.box.letsbuilda.dev ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA19eLgakX4Y69JrGaMetJlg4YmTBC7KoYvhnGiX83Iz
