@@ -1,1 +1,1 @@
-ssh-ed25519 REPLACE_WITH_CI_PUBLIC_KEY ci@letsbuilda/infrastructure
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL5Qm8eF6Sqdu+sOKMimDAWIJVlgmgyBQQhcOqapHmMI ci@letsbuilda/infrastructure
