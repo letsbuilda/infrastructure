@@ -1,3 +1,4 @@
+---
 rules:
   # Comment-per-permission is not this repo's style.
   undocumented-permissions:
@@ -5,5 +6,4 @@ rules:
   # CLOUDFLARE_RO_TOKEN is read-only and needed on every DNS PR; an environment
   # gate with required reviewers would defeat the automatic dry-run.
   secrets-outside-env:
-    ignore:
-      - dns-dry-run.yaml
+    ignore: [dns-dry-run.yaml]
