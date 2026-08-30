@@ -17,11 +17,30 @@ providers:
     account_id: env/CLOUDFLARE_ACCOUNT_ID
     pagerules: false
 
+# Cloudflare generates and owns a placeholder record for every Worker Custom Domain, R2
+# bucket custom domain, and rules-only hostname, and its API rejects edits to them.
+# Matching on value rather than name is what makes this automatic: adding a Worker, a
+# bucket, or a redirect needs no change here. It is also what keeps records like the apex
+# TXT and MX managed, since only the placeholder values match. Both filters default to
+# include_target: true, so they drop the record from the desired AND existing sides --
+# octodns neither manages these nor plans a Delete for the ones the zone files omit.
 processors:
-  ignore-cf-placeholders:
+  # Worker Custom Domains (100::) and rules-only "discard" hostnames (192.0.2.1), the
+  # dummy address Cloudflare documents for records that exist only so a request reaches
+  # their edge for a rule to act on. Matched as CIDRs, so how Cloudflare formats the
+  # address does not matter.
+  ignore-cf-generated-ips:
     class: octodns.processor.filter.NetworkValueRejectlistFilter
     rejectlist:
       - 100::/128
+      - 192.0.2.1/32
+
+  # R2 bucket custom domains, which Cloudflare points at public.r2.dev. Anchored on the
+  # target rather than the bucket's hostname so every bucket is covered automatically.
+  ignore-cf-generated-targets:
+    class: octodns.processor.filter.ValueRejectlistFilter
+    rejectlist:
+      - '/\.r2\.dev\.$/'
 
 zones:
   "*":
@@ -30,4 +49,5 @@ zones:
     targets:
       - cloudflare
     processors:
-      - ignore-cf-placeholders
+      - ignore-cf-generated-ips
+      - ignore-cf-generated-targets

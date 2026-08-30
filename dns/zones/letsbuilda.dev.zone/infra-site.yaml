@@ -18,20 +18,3 @@ id:
   octodns:
     cloudflare:
       auto-ttl: true
-
-# 192.0.2.1 is the dummy address Cloudflare documents for records that exist
-# only so a request reaches their edge for a rule to act on -- here the
-# Redirect Rule sending www to the apex. It must stay proxied: un-proxying it
-# would send visitors to an unroutable address instead of the redirect.
-#
-# `comment` mirrors the record comment Cloudflare wrote when the Redirect Rule
-# created this record. It is part of the record's state, so octodns diffs it
-# and it has to be declared here to keep the plan clean.
-www:
-  type: A
-  value: 192.0.2.1
-  octodns:
-    cloudflare:
-      proxied: true
-      auto-ttl: true
-      comment: Created during Cloudflare Rules deployment process for Redirect from WWW to root
