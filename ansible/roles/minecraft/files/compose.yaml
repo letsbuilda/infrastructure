@@ -18,7 +18,7 @@ services:
     environment:
       VERSION: "26.2"
       EULA: "TRUE"
-      TYPE: "FABRIC"
+      TYPE: "PAPER"
       DIFFICULTY: "hard"
       MEMORY: "4096M"
       MOTD: "Pet your local wolf!"
