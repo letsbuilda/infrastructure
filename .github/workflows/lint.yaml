@@ -27,3 +27,29 @@ jobs:
         run: uv sync
       - name: Run prek
         run: uv run prek run --all-files
+  ansible-lint:
+    name: Ansible lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d  # v10.0.1
+        with:
+          enable-cache: true
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version-file: pyproject.toml
+      - name: Sync dependencies
+        run: uv sync --frozen --only-group ansible
+      - name: Run ansible-lint
+        working-directory: ansible
+        run: uv run ansible-lint
+      - name: Run playbook syntax check
+        working-directory: ansible
+        env:
+          ANSIBLE_BECOME_ASK_PASS: 'false'
+        run: uv run ansible-playbook --syntax-check playbook.yaml

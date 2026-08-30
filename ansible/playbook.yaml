@@ -1,4 +1,7 @@
 ---
+- name: Manage users
+  hosts: all
+  roles: [users]
 - name: Run common setup
   hosts: all
   roles: [common]
