@@ -32,7 +32,10 @@ jobs:
       - name: Generate plan
         id: generate-plan
         env:
-          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_RO_TOKEN }}
+          # Read-only token, needed on every DNS PR; an environment gate with
+          # required reviewers would defeat the automatic dry-run. See
+          # docs/dns.md for the required token scope.
+          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_RO_TOKEN }}  # zizmor: ignore[secrets-outside-env]
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
         run: |-
           # octodns writes the rendered PlanMarkdown to stdout and its own logs
