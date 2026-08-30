@@ -12,5 +12,8 @@ services:
       DIFFICULTY: "hard"
       MEMORY: "4096M"
       MOTD: "Pet your local wolf!"
+      OPS: |
+        Shenanigander
+      EXISTING_OPS_FILE: SYNCHRONIZE
     volumes:
       - "./data:/data"
