@@ -2,14 +2,20 @@
 name: Generate DNS change plan
 on:
   pull_request:
+    paths: [dns/production.yaml, dns/zones/**]
 permissions:
   contents: read
+# Superseded pushes to the same PR only waste the read-only token; cancel them.
+concurrency:
+  group: dns-dry-run-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   octodns-sync:
     name: Run `octodns-sync` with production.yaml
     runs-on: ubuntu-latest
     outputs:
       plan: ${{ steps.generate-plan.outputs.plan }}
+      has_changes: ${{ steps.generate-plan.outputs.has_changes }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
@@ -34,18 +40,29 @@ jobs:
           # also visible in the job log for troubleshooting.
           plan="$(uv run octodns-sync --config-file=dns/production.yaml --force)"
           echo "$plan"
+          # PlanMarkdown emits exactly this line when the plan is empty.
+          # Deciding here, on the whole line, keeps a crafted record value from
+          # spoofing the "no changes" signal that gates the PR comment.
+          if grep -qxF '## No changes were planned' <<<"$plan"; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+          # Random delimiter so plan content (PR-controlled record values) can
+          # never terminate the heredoc early and forge further step outputs.
+          delimiter="OCTODNS_PLAN_$(openssl rand -hex 16)"
           {
-            echo "plan<<OCTODNS_PLAN_EOF"
+            echo "plan<<${delimiter}"
             echo "$plan"
-            echo "OCTODNS_PLAN_EOF"
+            echo "${delimiter}"
           } >> "$GITHUB_OUTPUT"
   add-pr-comment:
     name: Add `octodns-sync` plan to comment
-    if: ${{ ! contains(needs.octodns-sync.outputs.plan, 'No changes were planned') }}
+    if: ${{ needs.octodns-sync.outputs.has_changes == 'true' }}
     needs: [octodns-sync]
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
+      pull-requests: write  # `gh pr comment` creates/updates the plan comment
     steps:
       - name: Create or update comment
         env:
