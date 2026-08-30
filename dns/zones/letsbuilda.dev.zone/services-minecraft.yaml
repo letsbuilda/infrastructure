@@ -1,5 +1,5 @@
 ---
-pydis-smp:
+smp-py:
   - type: A
     value: 146.190.196.51
     octodns:
@@ -13,7 +13,7 @@ pydis-smp:
         proxied: false
         auto-ttl: true
 
-_minecraft._tcp.pydis-smp:
+_minecraft._tcp.smp-py:
   type: SRV
   value:
     priority: 0
