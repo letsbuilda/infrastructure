@@ -1,0 +1,7 @@
+---
+- name: Re-run the reserved IPv6 script
+  ansible.builtin.systemd_service:
+    name: reserved-ipv6.service
+    daemon_reload: true
+    state: restarted
+  become: true
