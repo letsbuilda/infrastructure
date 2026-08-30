@@ -1,1 +1,7 @@
 ansible/vault_password
+# Never commit private keys
+ci_ed25519
+id_*
+*.pem
+*.key
+!*.pub

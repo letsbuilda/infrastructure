@@ -35,7 +35,6 @@ jobs:
           install -d -m 0700 "$HOME/.ssh"
           printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
           chmod 0600 "$HOME/.ssh/id_ed25519"
-          cat ansible/known_hosts >> "$HOME/.ssh/known_hosts"
       - name: Run the playbook
         working-directory: ansible
         env:

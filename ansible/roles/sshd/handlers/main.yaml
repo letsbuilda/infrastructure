@@ -1,0 +1,11 @@
+---
+# Runs before Restart ssh (definition order), so a broken assembled config aborts the play
+- name: Check sshd config
+  ansible.builtin.command: /usr/sbin/sshd -t
+  changed_when: false
+  become: true
+- name: Restart ssh
+  ansible.builtin.systemd_service:
+    name: ssh.service
+    state: restarted
+  become: true

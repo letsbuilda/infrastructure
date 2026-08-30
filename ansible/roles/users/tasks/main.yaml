@@ -22,11 +22,12 @@
   ansible.builtin.group:
     name: docker
     system: true
+# groups: [] on purpose — the docker group is root-equivalent, and the
+# container gets letsbuilda's uid from compose's user: directive instead
 - name: Create the letsbuilda service user
   ansible.builtin.user:
     name: letsbuilda
     system: true
     shell: /usr/sbin/nologin
     create_home: true
-    groups: [docker]
-    append: true
+    groups: []

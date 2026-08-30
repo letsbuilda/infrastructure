@@ -4,8 +4,17 @@ on:
   push:
     branches: [main]
     paths: [dns/production.yaml, dns/zones/**]
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Pass --force to octodns-sync, applying an unsafe plan
+        type: boolean
+        default: false
 permissions:
   contents: read
+concurrency:
+  group: dns-deploy
+  cancel-in-progress: false
 jobs:
   octodns-sync:
     environment: cloudflare
@@ -28,4 +37,10 @@ jobs:
         env:
           CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-        run: uv run octodns-sync --config-file=dns/production.yaml --doit --force
+          FORCE_SYNC: ${{ inputs.force }}
+        run: |-
+          args=(--config-file=dns/production.yaml --doit)
+          if [[ "$FORCE_SYNC" == "true" ]]; then
+            args+=(--force)
+          fi
+          uv run octodns-sync "${args[@]}"
