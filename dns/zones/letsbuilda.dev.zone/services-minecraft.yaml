@@ -1,0 +1,25 @@
+---
+smp-py:
+  - type: A
+    value: 146.190.196.51
+    octodns:
+      cloudflare:
+        proxied: false
+        auto-ttl: true
+  - type: AAAA
+    value: 2604:a880:400:d1:0:4:e490:a001
+    octodns:
+      cloudflare:
+        proxied: false
+        auto-ttl: true
+
+_minecraft._tcp.smp-py:
+  type: SRV
+  value:
+    priority: 0
+    weight: 5
+    port: 25565
+    target: microwave.box.letsbuilda.dev.
+  octodns:
+    cloudflare:
+      auto-ttl: true
