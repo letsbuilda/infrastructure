@@ -22,11 +22,13 @@
   ansible.builtin.group:
     name: docker
     system: true
+# No supplementary groups: docker-group membership is root-equivalent (full
+# access to the Docker socket) and the container gets letsbuilda's uid from
+# compose's user: directive, not from who talks to the daemon.
 - name: Create the letsbuilda service user
   ansible.builtin.user:
     name: letsbuilda
     system: true
     shell: /usr/sbin/nologin
     create_home: true
-    groups: [docker]
-    append: true
+    groups: []

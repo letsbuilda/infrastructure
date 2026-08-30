@@ -20,15 +20,13 @@
 - name: Create the .env file
   ansible.builtin.copy:
     content: |
-      UID={{ ansible_facts.getent_passwd['letsbuilda'][1] }}
-      GID={{ ansible_facts.getent_passwd['letsbuilda'][2] }}
+      MINECRAFT_UID={{ ansible_facts.getent_passwd['letsbuilda'][1] }}
+      MINECRAFT_GID={{ ansible_facts.getent_passwd['letsbuilda'][2] }}
     dest: /opt/letsbuilda/minecraft/.env
     owner: letsbuilda
     group: letsbuilda
     mode: '0600'
 - name: Run the containers
-  become: true
-  become_user: letsbuilda
   community.docker.docker_compose_v2:
     project_src: /opt/letsbuilda/minecraft/
     remove_orphans: true
