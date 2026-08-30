@@ -10,10 +10,8 @@ on:
         description: Pass --force to octodns-sync, applying an unsafe plan
         type: boolean
         default: false
-# Checkout only; the DNS credentials come from the environment secrets.
 permissions:
   contents: read
-# Serialize applies so a slower run cannot clobber a newer one with a stale plan.
 concurrency:
   group: dns-deploy
   cancel-in-progress: false
@@ -39,12 +37,8 @@ jobs:
         env:
           CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          # Boolean workflow_dispatch input; empty string on push events.
           FORCE_SYNC: ${{ inputs.force }}
         run: |-
-          # Without --force, octodns refuses plans that update or delete >30%
-          # of a zone's records. Re-run via workflow_dispatch with force=true
-          # to apply an intentional bulk change.
           args=(--config-file=dns/production.yaml --doit)
           if [[ "$FORCE_SYNC" == "true" ]]; then
             args+=(--force)

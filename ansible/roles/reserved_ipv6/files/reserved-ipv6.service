@@ -8,9 +8,7 @@ After=network-online.target
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/local/sbin/reserved-ipv6.sh
-# Sandbox: the script only needs to query the metadata service over HTTP and
-# adjust addresses/routes via netlink, so CAP_NET_ADMIN is the sole capability
-# it keeps. Check `systemd-analyze security reserved-ipv6.service` after edits.
+# The script only needs metadata HTTP and netlink, so CAP_NET_ADMIN is the sole capability kept
 NoNewPrivileges=yes
 CapabilityBoundingSet=CAP_NET_ADMIN
 AmbientCapabilities=CAP_NET_ADMIN

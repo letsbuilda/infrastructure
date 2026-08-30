@@ -10,9 +10,7 @@
     owner: letsbuilda
     group: letsbuilda
     mode: '0700'
-# Without this, a fresh host would get a root-owned bind-mount source from
-# the docker daemon that the non-root container cannot write. Deliberately
-# not recursive; the server manages its own files under data/.
+# Otherwise the daemon creates a root-owned dir the non-root container cannot write
 - name: Create the data directory
   ansible.builtin.file:
     path: /opt/letsbuilda/minecraft/data

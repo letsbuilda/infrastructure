@@ -9,8 +9,7 @@ services:
       - "no-new-privileges:true"
     cap_drop:
       - ALL
-    # Cgroup ceilings above the fixed 4 GiB JVM heap (MEMORY below), so the
-    # JVM hits its own limit before the kernel OOM killer gets involved.
+    # Ceilings above the 4 GiB JVM heap (MEMORY below), so the JVM hits its limit first
     mem_limit: 6g
     mem_reservation: 4g
     pids_limit: 512

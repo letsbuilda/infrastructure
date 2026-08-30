@@ -1,5 +1,5 @@
 ansible/vault_password
-# Never commit private keys (the CI bootstrap generates one; see docs/ansible.md)
+# Never commit private keys
 ci_ed25519
 id_*
 *.pem

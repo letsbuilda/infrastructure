@@ -1,6 +1,4 @@
-// Managed by Ansible (roles/unattended_upgrades). Asserts the security origins
-// even if the packaged 50unattended-upgrades default ever changes (same-name
-// apt lists append across files; duplicates are harmless).
+// Managed by Ansible (roles/unattended_upgrades).
 Unattended-Upgrade::Allowed-Origins {
     "${distro_id}:${distro_codename}-security";
     "${distro_id}ESMApps:${distro_codename}-apps-security";
@@ -8,5 +6,4 @@ Unattended-Upgrade::Allowed-Origins {
 };
 Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
 Unattended-Upgrade::Remove-Unused-Dependencies "true";
-// Deliberately no Automatic-Reboot: kernel updates wait for a manual reboot,
-// which the playbook surfaces via /var/run/reboot-required on each deploy.
+// No Automatic-Reboot; pending reboots surface via /var/run/reboot-required on deploys.

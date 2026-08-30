@@ -4,7 +4,6 @@ set -euo pipefail
 IFACE_ETH0="eth0"
 IFACE_LO="lo"
 PREFIX_LEN="128"
-# Loose shape check for metadata values before they become ip(8) arguments.
 IPV6_RE='^[0-9a-fA-F:]*:[0-9a-fA-F:.]*$'
 
 md=$(curl --fail --silent --show-error --connect-timeout 2 --max-time 5 --noproxy '*' http://169.254.169.254/metadata/v1.json)

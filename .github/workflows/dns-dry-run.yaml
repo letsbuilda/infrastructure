@@ -5,7 +5,6 @@ on:
     paths: [dns/production.yaml, dns/zones/**]
 permissions:
   contents: read
-# Superseded pushes to the same PR only waste the read-only token; cancel them.
 concurrency:
   group: dns-dry-run-${{ github.ref }}
   cancel-in-progress: true
@@ -32,10 +31,7 @@ jobs:
       - name: Generate plan
         id: generate-plan
         env:
-          # Read-only token, needed on every DNS PR; an environment gate with
-          # required reviewers would defeat the automatic dry-run. See
-          # docs/dns.md for the required token scope.
-          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_RO_TOKEN }}  # zizmor: ignore[secrets-outside-env]
+          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_RO_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
         run: |-
           # octodns writes the rendered PlanMarkdown to stdout and its own logs
@@ -43,16 +39,13 @@ jobs:
           # also visible in the job log for troubleshooting.
           plan="$(uv run octodns-sync --config-file=dns/production.yaml --force)"
           echo "$plan"
-          # PlanMarkdown emits exactly this line when the plan is empty.
-          # Deciding here, on the whole line, keeps a crafted record value from
-          # spoofing the "no changes" signal that gates the PR comment.
+          # Whole-line match on PlanMarkdown's empty-plan sentinel; a record value cannot spoof it.
           if grep -qxF '## No changes were planned' <<<"$plan"; then
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
           else
             echo "has_changes=true" >> "$GITHUB_OUTPUT"
           fi
-          # Random delimiter so plan content (PR-controlled record values) can
-          # never terminate the heredoc early and forge further step outputs.
+          # Random delimiter so PR-controlled plan content cannot forge step outputs.
           delimiter="OCTODNS_PLAN_$(openssl rand -hex 16)"
           {
             echo "plan<<${delimiter}"
@@ -65,7 +58,7 @@ jobs:
     needs: [octodns-sync]
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write  # `gh pr comment` creates/updates the plan comment
+      pull-requests: write
     steps:
       - name: Create or update comment
         env:

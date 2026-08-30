@@ -32,8 +32,6 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |-
-          # Host key verification is pinned to ansible/known_hosts by
-          # ansible.cfg's ssh_args; nothing is appended to ~/.ssh here.
           install -d -m 0700 "$HOME/.ssh"
           printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
           chmod 0600 "$HOME/.ssh/id_ed25519"

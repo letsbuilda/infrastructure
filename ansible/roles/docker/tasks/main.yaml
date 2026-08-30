@@ -28,9 +28,6 @@
     name: docker-ce
     state: latest
     update_cache: true
-# Bounded container logs (a chatty container could otherwise fill the disk),
-# no-new-privileges as the daemon default, and live-restore so containers
-# survive daemon restarts where possible.
 - name: Configure the Docker daemon
   ansible.builtin.copy:
     src: daemon.json

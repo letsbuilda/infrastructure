@@ -6,7 +6,6 @@ on:
   pull_request:
 permissions:
   contents: read
-# Superseded pushes to the same ref only waste runner minutes; cancel them.
 concurrency:
   group: lint-${{ github.ref }}
   cancel-in-progress: true
@@ -31,8 +30,7 @@ jobs:
         run: uv sync
       - name: Run prek
         env:
-          # Lets zizmor run its online audits (e.g. known-vulnerable-actions);
-          # without a token it silently degrades to offline-only coverage.
+          # zizmor's online audits silently skip without a token
           GH_TOKEN: ${{ github.token }}
         run: uv run prek run --all-files
   ansible-lint:
