@@ -8,6 +8,9 @@
 - name: Run common setup
   hosts: all
   roles: [common]
+- name: Keep security patches applied
+  hosts: all
+  roles: [unattended_upgrades]
 - name: Route outbound traffic over the reserved IPv6
   hosts: microwave
   roles: [reserved_ipv6]
