@@ -3,6 +3,7 @@ services:
     image: itzg/minecraft-server:2026.8.2@sha256:efa878ddb49cf5251b2e5f2ad71b08fd2f7236c1f7907433f6697258b31d2ce4
     tty: true
     stdin_open: true
+    user: "${UID:?}:${GID:?}"
     ports:
       - "25565:25565"
     environment:
