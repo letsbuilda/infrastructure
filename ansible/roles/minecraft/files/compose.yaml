@@ -25,5 +25,18 @@ services:
       OPS: |
         Shenanigander
       EXISTING_OPS_FILE: SYNCHRONIZE
+      # Resolved against VERSION and the Paper loader on every start, newest
+      # release only. Left unpinned deliberately: Dependabot only understands
+      # image: lines, so a pinned plugin would go stale with nothing to bump it.
+      # No "?" suffix — if no compatible build exists the container must fail
+      # rather than come up with nothing authenticating players.
+      MODRINTH_PROJECTS: |
+        simple-login
+      # SimpleLogin soft-depends on ProtocolLib only to keep passwords out of
+      # the log, and ProtocolLib has no 26.2 release; the patch turns off
+      # spigot.yml's commands.log instead, which would otherwise record the
+      # /login line in the clear.
+      PATCH_DEFINITIONS: "/patches"
     volumes:
       - "./data:/data"
+      - "./patches:/patches:ro"

@@ -1,0 +1,11 @@
+---
+# Without ProtocolLib, Spigot writes "<player> issued server command:
+# /login <password>" into logs/latest.log in the clear. ProtocolLib is not on
+# Modrinth and has no 26.2 release, so player command logging goes off instead.
+patches:
+  - file: /data/spigot.yml
+    ops:
+      - $set:
+          path: $.commands.log
+          value: false
+          value-type: bool
