@@ -13,11 +13,15 @@ You connect as your own user and are prompted for your sudo (BECOME) password.
 
 ## CI deploys
 
-Pushes to `main` that touch `ansible/**` (and manual `workflow_dispatch` runs) run the
-playbook from GitHub Actions via the `ansible` GitHub Environment. CI connects as the
-dedicated `ci` user (created by the `users` role) using the `SSH_PRIVATE_KEY`
-environment secret, with passwordless sudo granted by `/etc/sudoers.d/ci`. The host
-key is pinned in `ansible/known_hosts`, keeping strict host key checking enabled.
+A cron runs the playbook from GitHub Actions every Sunday at 00:17 UTC, against
+whatever is on `main` at that moment; a `workflow_dispatch` run applies batched
+changes sooner. Merging does not deploy — dispatch a run when a change should land
+before Sunday, and after any `ansible/**` change whose runtime behavior the PR's
+`ansible-lint` and `--syntax-check` cannot prove. Both paths go through the `ansible`
+GitHub Environment. CI connects as the dedicated `ci` user (created by the `users`
+role) using the `SSH_PRIVATE_KEY` environment secret, with passwordless sudo granted
+by `/etc/sudoers.d/ci`. The host key is pinned in `ansible/known_hosts`, keeping
+strict host key checking enabled.
 
 ## Bootstrapping / key rotation
 
@@ -48,16 +52,20 @@ key). If the host is reinstalled, refresh `ansible/known_hosts` the same way as 
 
 ## Required repository settings
 
-Pushes to `main` execute the playbook as root on production, so the security boundary
-is exactly who (and what) can land a commit there. These settings live outside the
+CI executes the playbook as root on production from whatever is on `main` when the
+weekly cron fires, so the security boundary is who (and what) can land a commit
+there, plus who can start a `workflow_dispatch` run. These settings live outside the
 repo and nothing in CI fails when they drift — re-check them when auditing:
 
 - A ruleset on `main`: require a pull request, require review from Code Owners
   (`.github/CODEOWNERS` routes to `@letsbuilda/devops`), require the `Lint` and
   `Ansible lint` status checks, block force pushes and deletions, no bypass actors.
-- The `ansible` GitHub Environment: deployment branches restricted to `main`, at
-  least one required reviewer. This is what keeps a workflow edit on a topic branch
-  away from `SSH_PRIVATE_KEY`.
+- The `ansible` GitHub Environment: deployment branches restricted to `main`, and no
+  required reviewers. The branch restriction is what keeps a workflow edit on a topic
+  branch away from `SSH_PRIVATE_KEY`, and what stops a `workflow_dispatch` from any
+  branch but `main`. A required reviewer would gate the weekly cron too — an
+  unapproved Sunday run waits and GitHub fails it after 30 days — so the unattended
+  schedule depends on there being none.
 - The `cloudflare` GitHub Environment: deployment branches restricted to `main`.
 - `CLOUDFLARE_RO_TOKEN` stays a plain repository secret so PR dry-runs work
   unattended. Moving it into an environment only makes sense with no required
