@@ -47,7 +47,7 @@ services:
       # cannot drift out of the repo. RCON is enabled by default with a
       # generated password on 25575, which is not published.
       RCON_CMDS_STARTUP: |-
-        gamerule playersSleepingPercentage 0
+        gamerule players_sleeping_percentage 0
     volumes:
       - "./data:/data"
       - "./patches:/patches:ro"
