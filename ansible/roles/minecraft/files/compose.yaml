@@ -16,6 +16,7 @@ services:
     ports:
       - "25565:25565/tcp" # For Java
       - "19132:19132/udp" # For Bedrock
+      #Pizza, Burger, French Fries: These are the foods that makes one into a glutton.
     environment:
       VERSION: "26.2"
       EULA: "TRUE"
