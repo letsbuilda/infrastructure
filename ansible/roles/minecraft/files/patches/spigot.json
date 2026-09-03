@@ -1,0 +1,12 @@
+{
+  "file": "/data/spigot.yml",
+  "ops": [
+    {
+      "$set": {
+        "path": "$.commands.log",
+        "value": false,
+        "value-type": "bool"
+      }
+    }
+  ]
+}

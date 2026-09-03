@@ -34,13 +34,26 @@
     owner: letsbuilda
     group: letsbuilda
     mode: '0600'
+# Without ProtocolLib, Spigot writes "<player> issued server command:
+# /login <password>" into logs/latest.log in the clear. ProtocolLib is not on
+# Modrinth and has no 26.2 release, so player command logging goes off instead.
+# Definitions must be .json: with PATCH_DEFINITIONS naming a directory,
+# mc-image-helper enumerates *.json only and reads each file as a bare patch
+# definition rather than a patch set. A .yaml file is skipped silently and the
+# run still exits 0, so the patch looks applied when it never was.
 - name: Create the spigot.yml patch definition
   ansible.builtin.copy:
-    src: patches/spigot.yaml
-    dest: /opt/letsbuilda/minecraft/patches/spigot.yaml
+    src: patches/spigot.json
+    dest: /opt/letsbuilda/minecraft/patches/spigot.json
     owner: letsbuilda
     group: letsbuilda
     mode: '0600'
+# The .yaml form was never applied; drop it so it cannot be mistaken for a
+# working patch. Safe to remove from this role once the host has converged.
+- name: Remove the superseded YAML patch definition
+  ansible.builtin.file:
+    path: /opt/letsbuilda/minecraft/patches/spigot.yaml
+    state: absent
 - name: Create the .env file
   ansible.builtin.copy:
     content: |

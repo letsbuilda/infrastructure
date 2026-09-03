@@ -6,6 +6,7 @@ repos:
       - id: check-case-conflict
       - id: check-merge-conflict
       - id: detect-private-key
+      - id: check-json
       - id: check-yaml
         args: [--unsafe]
       - id: trailing-whitespace
