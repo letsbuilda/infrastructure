@@ -58,6 +58,11 @@
 # generates, so $put/$set resolve. If a future release renames either key the
 # patch raises PatchOperationException and the container fails to start — a
 # loud failure rather than a silently unbridged chat.
+# On a data volume where DiscordSRV has never run this patch is a no-op: the
+# plugin writes config.yml on first enable, and patches are applied before the
+# server starts. Only the second container start picks it up, and a repeat
+# converge will not do that on its own — the image digest is pinned, so Compose
+# recreates nothing. Restart the container by hand once after the first deploy.
 - name: Create the DiscordSRV patch definition
   ansible.builtin.copy:
     src: patches/discordsrv.json
