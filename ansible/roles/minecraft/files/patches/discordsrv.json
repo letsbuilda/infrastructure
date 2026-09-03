@@ -5,7 +5,7 @@
       "$put": {
         "path": "$.Channels",
         "key": "global",
-        "value": "REPLACE_WITH_DISCORD_CHANNEL_ID"
+        "value": "1543658496883425465"
       }
     },
     {
