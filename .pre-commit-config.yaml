@@ -6,6 +6,7 @@ repos:
       - id: check-case-conflict
       - id: check-merge-conflict
       - id: detect-private-key
+      - id: check-json
       - id: check-yaml
         args: [--unsafe]
       - id: trailing-whitespace
@@ -17,7 +18,8 @@ repos:
     rev: f857ca370af3db7e5e181373d45c06a148fac3f8  # frozen: 1.19.1
     hooks:
       - id: yamlfix
-        exclude: compose.yaml|dependabot.yaml|^dns
+        # Vaulted values live in group_vars; keep a formatter away from ciphertext.
+        exclude: compose.yaml|dependabot.yaml|^dns|^ansible/group_vars/
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: b84c4a0a90bd58c7d82ae8f0d4d5e77b1ddd3ce6  # frozen: 0.12.5
     hooks:

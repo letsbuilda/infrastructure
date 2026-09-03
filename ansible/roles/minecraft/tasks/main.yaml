@@ -34,22 +34,57 @@
     owner: letsbuilda
     group: letsbuilda
     mode: '0600'
+# Without ProtocolLib, Spigot writes "<player> issued server command:
+# /login <password>" into logs/latest.log in the clear. ProtocolLib is not on
+# Modrinth and has no 26.2 release, so player command logging goes off instead.
+# Definitions must be .json: with PATCH_DEFINITIONS naming a directory,
+# mc-image-helper enumerates *.json only and reads each file as a bare patch
+# definition rather than a patch set. A .yaml file is skipped silently and the
+# run still exits 0, so the patch looks applied when it never was.
 - name: Create the spigot.yml patch definition
   ansible.builtin.copy:
-    src: patches/spigot.yaml
-    dest: /opt/letsbuilda/minecraft/patches/spigot.yaml
+    src: patches/spigot.json
+    dest: /opt/letsbuilda/minecraft/patches/spigot.json
     owner: letsbuilda
     group: letsbuilda
     mode: '0600'
+# The .yaml form was never applied; drop it so it cannot be mistaken for a
+# working patch. Safe to remove from this role once the host has converged.
+- name: Remove the superseded YAML patch definition
+  ansible.builtin.file:
+    path: /opt/letsbuilda/minecraft/patches/spigot.yaml
+    state: absent
+# Channels and DiscordConsoleChannelId both exist in the config DiscordSRV
+# generates, so $put/$set resolve. If a future release renames either key the
+# patch raises PatchOperationException and the container fails to start — a
+# loud failure rather than a silently unbridged chat.
+# On a data volume where DiscordSRV has never run this patch is a no-op: the
+# plugin writes config.yml on first enable, and patches are applied before the
+# server starts. Only the second container start picks it up, and a repeat
+# converge will not do that on its own — the image digest is pinned, so Compose
+# recreates nothing. Restart the container by hand once after the first deploy.
+- name: Create the DiscordSRV patch definition
+  ansible.builtin.copy:
+    src: patches/discordsrv.json
+    dest: /opt/letsbuilda/minecraft/patches/discordsrv.json
+    owner: letsbuilda
+    group: letsbuilda
+    mode: '0600'
+# no_log because CI runs with --diff, which would otherwise print the rendered
+# file — bot token included — into the Actions log of a public repository.
+# GitHub masks secrets.* values, but the decrypted token is a value it has
+# never seen and will not redact.
 - name: Create the .env file
   ansible.builtin.copy:
     content: |
       MINECRAFT_UID={{ ansible_facts.getent_passwd['letsbuilda'][1] }}
       MINECRAFT_GID={{ ansible_facts.getent_passwd['letsbuilda'][2] }}
+      DISCORDSRV_TOKEN={{ discordsrv_bot_token }}
     dest: /opt/letsbuilda/minecraft/.env
     owner: letsbuilda
     group: letsbuilda
     mode: '0600'
+  no_log: true
 - name: Run the containers
   community.docker.docker_compose_v2:
     project_src: /opt/letsbuilda/minecraft/

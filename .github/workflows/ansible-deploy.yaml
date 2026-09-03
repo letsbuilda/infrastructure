@@ -35,9 +35,19 @@ jobs:
           install -d -m 0700 "$HOME/.ssh"
           printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
           chmod 0600 "$HOME/.ssh/id_ed25519"
+      - name: Configure Ansible Vault
+        env:
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: |-
+          # install first so the file is never briefly world-readable, and
+          # RUNNER_TEMP rather than HOME because the runner empties it at the
+          # end of every job, leaving nothing to clean up.
+          install -m 0600 /dev/null "$RUNNER_TEMP/vault_password"
+          printf '%s' "$ANSIBLE_VAULT_PASSWORD" > "$RUNNER_TEMP/vault_password"
       - name: Run ansible-playbook
         working-directory: ansible
         env:
           ANSIBLE_REMOTE_USER: ci
           ANSIBLE_BECOME_ASK_PASS: 'false'
+          ANSIBLE_VAULT_PASSWORD_FILE: ${{ runner.temp }}/vault_password
         run: uv run ansible-playbook --diff playbook.yaml

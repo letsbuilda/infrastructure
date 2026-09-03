@@ -6,10 +6,12 @@ Server configuration lives in `ansible/`. All commands below run from that direc
 
 ```
 uv sync --group ansible
-uv run ansible-playbook --diff playbook.yaml
+uv run ansible-playbook --diff --vault-password-file vault_password playbook.yaml
 ```
 
 You connect as your own user and are prompted for your sudo (BECOME) password.
+The gitignored `ansible/vault_password` holds the vault password (see
+[Secrets](#secrets)); `--ask-vault-pass` prompts for it instead.
 
 ## CI deploys
 
@@ -21,7 +23,33 @@ before Sunday, and after any `ansible/**` change whose runtime behavior the PR's
 GitHub Environment. CI connects as the dedicated `ci` user (created by the `users`
 role) using the `SSH_PRIVATE_KEY` environment secret, with passwordless sudo granted
 by `/etc/sudoers.d/ci`. The host key is pinned in `ansible/known_hosts`, keeping
-strict host key checking enabled.
+strict host key checking enabled. The vault password comes from the
+`ANSIBLE_VAULT_PASSWORD` environment secret.
+
+## Secrets
+
+Secrets that have to reach a host live in `ansible/group_vars/all.yaml`,
+encrypted per value:
+
+```
+cd ansible
+uv run ansible-vault encrypt_string \
+  --vault-password-file vault_password --stdin-name my_secret
+```
+
+Per value rather than whole-file, so the rest of the file stays lintable and
+diffs stay reviewable. The tradeoff is that `ansible-vault rekey` does not work
+on inline values: rotating the vault password means re-encrypting every value
+and updating the `ANSIBLE_VAULT_PASSWORD` secret in the same change.
+
+Any task that writes a secret to a host needs `no_log: true` — CI runs with
+`--diff` and this repository's Actions logs are public.
+
+Do not put `vault_password_file` in `ansible.cfg`. Ansible resolves it on every
+run whether or not that run touches vaulted data, and a missing file is fatal;
+`9a65f59` removed it for exactly that reason. Pass `--vault-password-file`, or
+`ANSIBLE_VAULT_PASSWORD_FILE` as CI does — ansible-core has no
+`ANSIBLE_VAULT_PASSWORD` variable, only a path to a file.
 
 ## Bootstrapping / key rotation
 
@@ -65,7 +93,8 @@ repo and nothing in CI fails when they drift — re-check them when auditing:
   branch away from `SSH_PRIVATE_KEY`, and what stops a `workflow_dispatch` from any
   branch but `main`. A required reviewer would gate the weekly cron too — an
   unapproved Sunday run waits and GitHub fails it after 30 days — so the unattended
-  schedule depends on there being none.
+  schedule depends on there being none. `ANSIBLE_VAULT_PASSWORD` lives here too,
+  and for the same reason — the `Lint` workflow must never be able to read it.
 - The `cloudflare` GitHub Environment: deployment branches restricted to `main`.
 - `CLOUDFLARE_RO_TOKEN` stays a plain repository secret so PR dry-runs work
   unattended. Moving it into an environment only makes sense with no required

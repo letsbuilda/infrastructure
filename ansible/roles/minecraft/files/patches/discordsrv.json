@@ -1,0 +1,18 @@
+{
+  "file": "/data/plugins/DiscordSRV/config.yml",
+  "ops": [
+    {
+      "$put": {
+        "path": "$.Channels",
+        "key": "global",
+        "value": "1543658496883425465"
+      }
+    },
+    {
+      "$set": {
+        "path": "$.DiscordConsoleChannelId",
+        "value": ""
+      }
+    }
+  ]
+}
