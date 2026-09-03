@@ -6,10 +6,14 @@ Server configuration lives in `ansible/`. All commands below run from that direc
 
 ```
 uv sync --group ansible
-uv run ansible-playbook --diff playbook.yaml
+uv run ansible-playbook --diff --vault-password-file vault_password playbook.yaml
 ```
 
 You connect as your own user and are prompted for your sudo (BECOME) password.
+`ansible/vault_password` is gitignored and holds the vault password (see
+[Secrets](#secrets)); `--ask-vault-pass` works instead if you would rather type
+it. Without one of the two the run fails at the first task that reads a vaulted
+value.
 
 ## CI deploys
 
@@ -21,7 +25,101 @@ before Sunday, and after any `ansible/**` change whose runtime behavior the PR's
 GitHub Environment. CI connects as the dedicated `ci` user (created by the `users`
 role) using the `SSH_PRIVATE_KEY` environment secret, with passwordless sudo granted
 by `/etc/sudoers.d/ci`. The host key is pinned in `ansible/known_hosts`, keeping
-strict host key checking enabled.
+strict host key checking enabled. The vault password comes from the
+`ANSIBLE_VAULT_PASSWORD` environment secret, written to `$RUNNER_TEMP` and
+passed via `ANSIBLE_VAULT_PASSWORD_FILE` so the `ansible-playbook` line stays
+identical to the local one.
+
+## Secrets
+
+Secrets that have to reach a host live in `ansible/group_vars/all.yaml`,
+encrypted individually with `ansible-vault encrypt_string` rather than by
+encrypting the whole file.
+
+Both forms survive CI — the `Lint` job has no vault password, and neither
+`ansible-lint` nor `ansible-playbook --syntax-check` fails on encrypted content
+without one. The difference is what they can still check. `ansible-lint` runs
+with a dummy password, so against a whole-file vault it gives up on the file and
+logs `Ignored exception from JinjaRule / VariableNamingRule ... Decryption
+failed`, reporting a pass without having linted it. With inline values only the
+ciphertext is opaque, so the rest of the file keeps getting checked. Inline also
+keeps variable names greppable and diffs reviewable, and avoids `ansible-vault
+edit`, which exposes plaintext through editor swap and backup files.
+
+The cost is rotation: `ansible-vault rekey` does not work on inline values.
+
+Do **not** put `vault_password_file` in `ansible.cfg`. Ansible resolves it
+unconditionally, whether or not the run touches vaulted data, and a missing file
+is a hard error — `The vault password file ... was not found`. That is exactly
+why `9a65f59` removed it, and the gitignored `ansible/vault_password` path is
+what remained. Pass `--vault-password-file` (or `ANSIBLE_VAULT_PASSWORD_FILE`)
+per invocation instead. There is no `ANSIBLE_VAULT_PASSWORD` variable in
+ansible-core; only a path to a file is supported.
+
+To add a secret:
+
+```
+cd ansible
+uv run ansible-vault encrypt_string \
+  --vault-password-file vault_password --stdin-name my_secret
+```
+
+Paste the value, press Ctrl-D without a trailing newline, and put the output in
+`group_vars/all.yaml`. Use the `--stdin-name` prompt form rather than passing
+the value as an argument, which would leave it in your shell history.
+
+Any task that writes a secret to a host needs `no_log: true`. CI runs with
+`--diff`, this repository is public, and GitHub only masks the literal
+`secrets.*` values it issued — a token decrypted from the vault is not one of
+them and will be printed verbatim.
+
+To rotate the vault password: re-run `encrypt_string` for every value in
+`group_vars/all.yaml` with
+the new password and update the `ANSIBLE_VAULT_PASSWORD` environment secret in
+the same change. Changing the secret without re-encrypting leaves the next
+unattended Sunday run failing with `Decryption failed`.
+
+## Discord bridge
+
+`smp-py` bridges in-game chat to Discord with
+[DiscordSRV](https://modrinth.com/plugin/discordsrv), installed through
+`MODRINTH_PROJECTS` like every other plugin. The bot token is vaulted and
+reaches the container as `DISCORDSRV_TOKEN`; the channel mapping is not a
+secret and lives in `roles/minecraft/files/patches/discordsrv.json`. The Discord
+console channel is explicitly disabled — running server commands from Discord
+would put a second, weaker path to the console next to SSH.
+
+Nothing needs opening on the firewall: DiscordSRV only makes outbound
+connections.
+
+First-time setup, outside the repo:
+
+1. Create an application at <https://discord.com/developers/applications>, add a
+   bot, and enable **both** privileged gateway intents (SERVER MEMBERS and
+   MESSAGE CONTENT). DiscordSRV does not work without them.
+2. Under Installation, set Install Link to None and disable User Install.
+3. Invite the bot with <https://scarsz.me/authorize> using the Application ID.
+   It needs Manage Roles, Manage Channels, Manage Nicknames and Manage Webhooks
+   on the server, plus View Channel, Send Messages, Manage Messages, Embed
+   Links, Read Message History and Add Reactions on the bridged channel.
+4. Put the bot token in the vault as `discordsrv_bot_token` (see
+   [Secrets](#secrets)), and replace `REPLACE_WITH_DISCORD_CHANNEL_ID` in
+   `ansible/roles/minecraft/files/patches/discordsrv.json` with the channel ID
+   (right-click the channel with Developer Mode on, Copy Channel ID). The
+   channel ID is not a secret; it is useless without the bot token.
+5. Deploy, then **restart the container once**:
+
+   ```
+   ssh ci@microwave.box.letsbuilda.dev \
+     'sudo docker compose -f /opt/letsbuilda/minecraft/compose.yaml restart minecraft'
+   ```
+
+   `plugins/DiscordSRV/config.yml` does not exist until DiscordSRV has enabled
+   once, and patches are applied before the server starts, so on the first
+   converge the patch logs `Unable to patch ... it is not an existing file` and
+   does nothing. A repeat `workflow_dispatch` will not fix this on its own — the
+   image digest is pinned, so Compose recreates nothing. Only the second
+   container start applies the channel mapping.
 
 ## Bootstrapping / key rotation
 
@@ -66,6 +164,10 @@ repo and nothing in CI fails when they drift — re-check them when auditing:
   branch but `main`. A required reviewer would gate the weekly cron too — an
   unapproved Sunday run waits and GitHub fails it after 30 days — so the unattended
   schedule depends on there being none.
+- The `ansible` GitHub Environment also holds `ANSIBLE_VAULT_PASSWORD`. Keep it
+  an environment secret rather than a repository secret: the `main`-only branch
+  restriction is what stops a workflow edit on a topic branch from reading it,
+  and the `Lint` workflow must never be given access.
 - The `cloudflare` GitHub Environment: deployment branches restricted to `main`.
 - `CLOUDFLARE_RO_TOKEN` stays a plain repository secret so PR dry-runs work
   unattended. Moving it into an environment only makes sense with no required

@@ -54,15 +54,32 @@
   ansible.builtin.file:
     path: /opt/letsbuilda/minecraft/patches/spigot.yaml
     state: absent
+# Channels and DiscordConsoleChannelId both exist in the config DiscordSRV
+# generates, so $put/$set resolve. If a future release renames either key the
+# patch raises PatchOperationException and the container fails to start — a
+# loud failure rather than a silently unbridged chat.
+- name: Create the DiscordSRV patch definition
+  ansible.builtin.copy:
+    src: patches/discordsrv.json
+    dest: /opt/letsbuilda/minecraft/patches/discordsrv.json
+    owner: letsbuilda
+    group: letsbuilda
+    mode: '0600'
+# no_log because CI runs with --diff, which would otherwise print the rendered
+# file — bot token included — into the Actions log of a public repository.
+# GitHub masks secrets.* values, but the decrypted token is a value it has
+# never seen and will not redact.
 - name: Create the .env file
   ansible.builtin.copy:
     content: |
       MINECRAFT_UID={{ ansible_facts.getent_passwd['letsbuilda'][1] }}
       MINECRAFT_GID={{ ansible_facts.getent_passwd['letsbuilda'][2] }}
+      DISCORDSRV_TOKEN={{ discordsrv_bot_token }}
     dest: /opt/letsbuilda/minecraft/.env
     owner: letsbuilda
     group: letsbuilda
     mode: '0600'
+  no_log: true
 - name: Run the containers
   community.docker.docker_compose_v2:
     project_src: /opt/letsbuilda/minecraft/

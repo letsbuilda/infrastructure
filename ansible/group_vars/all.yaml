@@ -1,2 +1,23 @@
 ---
 repo_root: '{{ playbook_dir }}/..'
+
+# Vaulted per value with `ansible-vault encrypt_string`, not by encrypting the
+# whole file. An inline !vault value is only decrypted when something actually
+# reads it, so the rest of the file stays plain YAML that ansible-lint can still
+# check. Encrypting the file instead makes ansible-lint give up on it — it runs
+# with a dummy password and logs "Ignored exception from JinjaRule /
+# VariableNamingRule ... Decryption failed", passing the file without linting
+# it. Inline also keeps variable names greppable and diffs reviewable.
+#
+# The cost: `ansible-vault rekey` does not work on inline values. Keep them all
+# in this file so rotating the vault password is one mechanical sweep.
+#
+# discordsrv_bot_token is NOT set yet. Generate it with:
+#
+#   cd ansible
+#   printf '%s' "$(openssl rand -base64 32)" > vault_password && chmod 0600 vault_password
+#   uv run ansible-vault encrypt_string \
+#     --vault-password-file vault_password --stdin-name discordsrv_bot_token
+#
+# then paste the output below. Until it exists the minecraft role fails with an
+# undefined-variable error, so this must land before the change is merged.

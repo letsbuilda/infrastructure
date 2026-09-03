@@ -35,14 +35,24 @@ services:
       # release only. Left unpinned deliberately: Dependabot only understands
       # image: lines, so a pinned plugin would go stale with nothing to bump it.
       # No "?" suffix — if no compatible build exists the container must fail
-      # rather than come up with nothing authenticating players.
+      # rather than come up with nothing authenticating players. VERSION is
+      # pinned, so these resolve against a fixed game version rather than
+      # drifting with each Minecraft release.
       MODRINTH_PROJECTS: |
         simple-login
+        discordsrv
       # SimpleLogin soft-depends on ProtocolLib only to keep passwords out of
       # the log, and ProtocolLib has no 26.2 release; the patch turns off
       # spigot.yml's commands.log instead, which would otherwise record the
       # /login line in the clear.
       PATCH_DEFINITIONS: "/patches"
+      # DiscordSRV reads System.getenv("DISCORDSRV_TOKEN") before it falls back
+      # to BotToken in config.yml, so the token never lands in the data volume
+      # and never reaches a /discord debug upload. Ansible writes it into .env
+      # from the vault. The name is deliberately not CFG_-prefixed:
+      # REPLACE_ENV_VARIABLE_PREFIX defaults to CFG_, so this value is not
+      # eligible for interpolation into any file under /data.
+      DISCORDSRV_TOKEN: "${DISCORDSRV_TOKEN:?}"
       # Re-applied on every start rather than set once by hand, so the gamerule
       # cannot drift out of the repo. RCON is enabled by default with a
       # generated password on 25575, which is not published.
