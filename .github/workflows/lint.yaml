@@ -25,7 +25,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
         with:
-          python-version-file: pyproject.toml
+          python-version-file: .python-version
       - name: Sync dependencies
         run: uv sync
       - name: Run prek
@@ -48,7 +48,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
         with:
-          python-version-file: pyproject.toml
+          python-version-file: .python-version
       - name: Sync dependencies
         run: uv sync --frozen --only-group ansible
       - name: Run ansible-lint
